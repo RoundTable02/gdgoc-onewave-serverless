@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { GcsStorageService } from './gcs-storage.service';
@@ -62,7 +64,9 @@ describe('GcsStorageService', () => {
 
       const url = await service.uploadBuffer(buffer, path, contentType);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/test/file.txt');
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/test/file.txt',
+      );
     });
 
     it('should upload PNG image buffer', async () => {
@@ -72,7 +76,9 @@ describe('GcsStorageService', () => {
 
       const url = await service.uploadBuffer(buffer, path, contentType);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/evidence/123/screenshot.png');
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/evidence/123/screenshot.png',
+      );
       expect(url).toContain('.png');
     });
 
@@ -84,7 +90,9 @@ describe('GcsStorageService', () => {
 
       const url = await service.uploadBuffer(buffer, path, contentType);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/evidence/456/dom.html');
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/evidence/456/dom.html',
+      );
       expect(url).toContain('.html');
     });
 
@@ -116,7 +124,9 @@ describe('GcsStorageService', () => {
 
       const url = await service.uploadFile(localPath, remotePath);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/evidence/789/recording.webm');
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/evidence/789/recording.webm',
+      );
     });
 
     it('should handle video file upload', async () => {
@@ -135,7 +145,9 @@ describe('GcsStorageService', () => {
 
       const url = await service.uploadFile(localPath, remotePath);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/uploads/file.txt');
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/uploads/file.txt',
+      );
     });
   });
 

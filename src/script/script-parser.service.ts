@@ -10,11 +10,12 @@ export class ScriptParserService {
 
     // test('taskName', async ({ page }) => { ... }) 패턴 추출
     // 중첩된 중괄호를 처리하기 위한 더 정교한 파싱
-    const testPattern = /test\s*\(\s*['"]([^'"]+)['"]\s*,\s*async\s*\(\s*\{\s*page\s*\}\s*\)\s*=>\s*\{/g;
+    const testPattern =
+      /test\s*\(\s*['"]([^'"]+)['"]\s*,\s*async\s*\(\s*\{\s*page\s*\}\s*\)\s*=>\s*\{/g;
 
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = testPattern.exec(script)) !== null) {
-      const taskName = match[1];
+      const taskName = match[1] ?? '';
       const startIndex = match.index + match[0].length;
 
       // 중괄호 매칭으로 테스트 본문 추출
@@ -22,8 +23,9 @@ export class ScriptParserService {
       let endIndex = startIndex;
 
       for (let i = startIndex; i < script.length && braceCount > 0; i++) {
-        if (script[i] === '{') braceCount++;
-        else if (script[i] === '}') braceCount--;
+        const char = script[i];
+        if (char === '{') braceCount++;
+        else if (char === '}') braceCount--;
         endIndex = i;
       }
 

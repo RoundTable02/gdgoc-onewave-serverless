@@ -7,12 +7,7 @@ import { EvidenceModule } from '../evidence/evidence.module';
 import { FeedbackModule } from '../feedback/feedback.module';
 
 @Module({
-  imports: [
-    BrowserModule,
-    ScriptModule,
-    EvidenceModule,
-    FeedbackModule,
-  ],
+  imports: [BrowserModule, ScriptModule, EvidenceModule, FeedbackModule],
   controllers: [GradingController],
   providers: [GradingService],
   exports: [GradingService],

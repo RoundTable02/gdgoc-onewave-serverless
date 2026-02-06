@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { GeminiService } from './gemini.service';
@@ -6,7 +12,11 @@ import { GeminiService } from './gemini.service';
 jest.mock('@google/generative-ai', () => {
   const mockGenerateContent = jest.fn().mockResolvedValue({
     response: {
-      text: jest.fn().mockReturnValue('{"summary": "test", "suggestion": "test suggestion", "severity": "medium"}'),
+      text: jest
+        .fn()
+        .mockReturnValue(
+          '{"summary": "test", "suggestion": "test suggestion", "severity": "medium"}',
+        ),
     },
   });
 

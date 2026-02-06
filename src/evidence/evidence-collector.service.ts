@@ -15,7 +15,7 @@ export class EvidenceCollectorService {
   ): Promise<string> {
     const screenshot = await page.screenshot({
       type: 'png',
-      fullPage: true
+      fullPage: true,
     });
 
     const path = `evidence/${submissionId}/${taskId}/screenshot.png`;
@@ -47,8 +47,8 @@ export class EvidenceCollectorService {
     try {
       const videoPath = await video.path();
       const remotePath = `evidence/${submissionId}/recording.webm`;
-      return this.gcsStorage.uploadFile(videoPath!, remotePath);
-    } catch (error) {
+      return this.gcsStorage.uploadFile(videoPath, remotePath);
+    } catch {
       this.logger.warn('Failed to save video recording');
       return undefined;
     }

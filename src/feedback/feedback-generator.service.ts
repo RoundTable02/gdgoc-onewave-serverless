@@ -10,14 +10,15 @@ export class FeedbackGeneratorService {
 
   async generateFeedback(
     error: ScriptError,
-    screenshotUrl?: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _screenshotUrl?: string,
   ): Promise<Feedback> {
     const prompt = this.buildPrompt(error);
 
     try {
       const response = await this.geminiService.generateContent(prompt);
       return this.parseFeedback(response);
-    } catch (err) {
+    } catch {
       this.logger.warn('Failed to generate AI feedback, using fallback');
       return {
         summary: `테스트 실패: ${error.message}`,
@@ -50,10 +51,14 @@ ${error.code}
 
   private parseFeedback(response: string): Feedback {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const parsed = JSON.parse(response);
       return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         summary: parsed.summary || '테스트 실패',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         suggestion: parsed.suggestion || '코드를 확인해주세요.',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         severity: parsed.severity,
       };
     } catch {

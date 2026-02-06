@@ -9,9 +9,7 @@ export class GeminiService {
   private readonly logger = new Logger(GeminiService.name);
 
   constructor(private configService: ConfigService) {
-    this.genAI = new GoogleGenerativeAI(
-      configService.get('GEMINI_API_KEY')!,
-    );
+    this.genAI = new GoogleGenerativeAI(configService.get('GEMINI_API_KEY')!);
     this.model = this.genAI.getGenerativeModel({
       model: 'gemini-2.0-flash-exp',
     });

@@ -69,7 +69,7 @@ describe('ScriptParserService', () => {
       expect(result).toHaveLength(1);
       expect(result[0].taskName).toBe('Complex test');
       expect(result[0].code).toContain('if (true)');
-      expect(result[0].code).toContain('{ key: \'value\' }');
+      expect(result[0].code).toContain("{ key: 'value' }");
     });
 
     it('should handle test with double quotes', () => {

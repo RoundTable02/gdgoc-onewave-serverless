@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Test, TestingModule } from '@nestjs/testing';
 import { FeedbackGeneratorService } from './feedback-generator.service';
 import { GeminiService } from './gemini/gemini.service';
-import { ScriptError, Feedback } from './interfaces/feedback.interface';
+import { ScriptError } from './interfaces/feedback.interface';
 
 describe('FeedbackGeneratorService', () => {
   let service: FeedbackGeneratorService;
@@ -14,7 +17,7 @@ describe('FeedbackGeneratorService', () => {
           summary: '테스트 실패: 요소를 찾을 수 없습니다',
           suggestion: 'CSS 선택자를 확인하고 정확한 요소를 지정해주세요',
           severity: 'medium',
-        })
+        }),
       ),
     };
 
@@ -57,7 +60,8 @@ describe('FeedbackGeneratorService', () => {
         code: 'await page.click("button");',
         message: 'Element not found',
       };
-      const screenshotUrl = 'https://storage.googleapis.com/bucket/screenshot.png';
+      const screenshotUrl =
+        'https://storage.googleapis.com/bucket/screenshot.png';
 
       const feedback = await service.generateFeedback(error, screenshotUrl);
 
@@ -144,7 +148,7 @@ describe('FeedbackGeneratorService', () => {
 
     it('should use fallback when AI fails', async () => {
       (geminiService.generateContent as jest.Mock).mockRejectedValueOnce(
-        new Error('API Error')
+        new Error('API Error'),
       );
 
       const error: ScriptError = {
@@ -161,7 +165,7 @@ describe('FeedbackGeneratorService', () => {
 
     it('should handle invalid JSON response', async () => {
       (geminiService.generateContent as jest.Mock).mockResolvedValueOnce(
-        'Invalid JSON string'
+        'Invalid JSON string',
       );
 
       const error: ScriptError = {
@@ -178,7 +182,7 @@ describe('FeedbackGeneratorService', () => {
 
     it('should handle partial JSON response', async () => {
       (geminiService.generateContent as jest.Mock).mockResolvedValueOnce(
-        JSON.stringify({ summary: 'Only summary' })
+        JSON.stringify({ summary: 'Only summary' }),
       );
 
       const error: ScriptError = {
@@ -195,7 +199,7 @@ describe('FeedbackGeneratorService', () => {
 
     it('should handle empty response fields', async () => {
       (geminiService.generateContent as jest.Mock).mockResolvedValueOnce(
-        JSON.stringify({ summary: '', suggestion: '' })
+        JSON.stringify({ summary: '', suggestion: '' }),
       );
 
       const error: ScriptError = {
@@ -222,13 +226,13 @@ describe('FeedbackGeneratorService', () => {
       await service.generateFeedback(error);
 
       expect(geminiService.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('Test task')
+        expect.stringContaining('Test task'),
       );
       expect(geminiService.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('test error')
+        expect.stringContaining('test error'),
       );
       expect(geminiService.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('test code')
+        expect.stringContaining('test code'),
       );
     });
 
@@ -242,7 +246,7 @@ describe('FeedbackGeneratorService', () => {
       await service.generateFeedback(error);
 
       expect(geminiService.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('JSON')
+        expect.stringContaining('JSON'),
       );
     });
 
@@ -255,7 +259,8 @@ describe('FeedbackGeneratorService', () => {
 
       await service.generateFeedback(error);
 
-      const promptCall = (geminiService.generateContent as jest.Mock).mock.calls[0][0];
+      const promptCall = (geminiService.generateContent as jest.Mock).mock
+        .calls[0][0];
       expect(promptCall).toContain('summary');
       expect(promptCall).toContain('suggestion');
       expect(promptCall).toContain('severity');
@@ -269,7 +274,7 @@ describe('FeedbackGeneratorService', () => {
           summary: 'Valid summary',
           suggestion: 'Valid suggestion',
           severity: 'high',
-        })
+        }),
       );
 
       const error: ScriptError = {
@@ -290,7 +295,7 @@ describe('FeedbackGeneratorService', () => {
         JSON.stringify({
           summary: 'Summary',
           suggestion: 'Suggestion',
-        })
+        }),
       );
 
       const error: ScriptError = {

@@ -4,7 +4,7 @@ export interface RetryOptions {
   maxDelay?: number;
 }
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function isRetryable(error: Error): boolean {
   const retryablePatterns = [
@@ -13,7 +13,7 @@ function isRetryable(error: Error): boolean {
     'ECONNRESET',
     'Navigation timeout',
   ];
-  return retryablePatterns.some(p => error.message.includes(p));
+  return retryablePatterns.some((p) => error.message.includes(p));
 }
 
 export async function withRetry<T>(

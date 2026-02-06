@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { EvidenceCollectorService } from './evidence-collector.service';
 import { GcsStorageService } from './storage/gcs-storage.service';
@@ -21,11 +22,15 @@ describe('EvidenceCollectorService', () => {
   beforeEach(async () => {
     // Mock GcsStorageService
     const mockGcsStorage = {
-      uploadBuffer: jest.fn().mockImplementation((buffer, path, contentType) => {
-        return Promise.resolve(`https://storage.googleapis.com/test-bucket/${path}`);
+      uploadBuffer: jest.fn().mockImplementation((buffer, path) => {
+        return Promise.resolve(
+          `https://storage.googleapis.com/test-bucket/${path}`,
+        );
       }),
       uploadFile: jest.fn().mockImplementation((localPath, remotePath) => {
-        return Promise.resolve(`https://storage.googleapis.com/test-bucket/${remotePath}`);
+        return Promise.resolve(
+          `https://storage.googleapis.com/test-bucket/${remotePath}`,
+        );
       }),
     };
 
@@ -44,7 +49,9 @@ describe('EvidenceCollectorService', () => {
 
     context = await browser.newContext();
     page = await context.newPage();
-    await page.setContent('<html><body><h1>Test Evidence Page</h1><p>Content</p></body></html>');
+    await page.setContent(
+      '<html><body><h1>Test Evidence Page</h1><p>Content</p></body></html>',
+    );
   });
 
   afterEach(async () => {
@@ -63,11 +70,15 @@ describe('EvidenceCollectorService', () => {
 
       const url = await service.captureScreenshot(page, submissionId, taskId);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/evidence/sub-123/task-1/screenshot.png');
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalledWith(
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/evidence/sub-123/task-1/screenshot.png',
+      );
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalledWith(
         expect.any(Buffer),
         'evidence/sub-123/task-1/screenshot.png',
-        'image/png'
+        'image/png',
       );
     });
 
@@ -77,11 +88,15 @@ describe('EvidenceCollectorService', () => {
 
       const url = await service.captureScreenshot(page, submissionId, taskId);
 
-      expect(url).toContain('evidence/submission-456/task-check-title/screenshot.png');
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalled();
+      expect(url).toContain(
+        'evidence/submission-456/task-check-title/screenshot.png',
+      );
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalled();
 
       // Buffer가 실제 데이터를 포함하는지 확인
-      const call = (gcsStorageService.uploadBuffer as jest.Mock).mock.calls[0];
+      const call = uploadBufferMock.mock.calls[0] as [Buffer, string, string];
       const buffer = call[0];
       expect(buffer).toBeInstanceOf(Buffer);
       expect(buffer.length).toBeGreaterThan(0);
@@ -116,7 +131,9 @@ describe('EvidenceCollectorService', () => {
       const url = await service.captureScreenshot(page, 'sub-789', 'task-long');
 
       expect(url).toBeDefined();
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalled();
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalled();
     });
   });
 
@@ -127,11 +144,15 @@ describe('EvidenceCollectorService', () => {
 
       const url = await service.captureDOMSnapshot(page, submissionId, taskId);
 
-      expect(url).toBe('https://storage.googleapis.com/test-bucket/evidence/sub-123/task-1/dom.html');
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalledWith(
+      expect(url).toBe(
+        'https://storage.googleapis.com/test-bucket/evidence/sub-123/task-1/dom.html',
+      );
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalledWith(
         expect.any(Buffer),
         'evidence/sub-123/task-1/dom.html',
-        'text/html'
+        'text/html',
       );
     });
 
@@ -144,7 +165,8 @@ describe('EvidenceCollectorService', () => {
       expect(url).toContain('dom.html');
 
       // HTML 콘텐츠 확인
-      const call = (gcsStorageService.uploadBuffer as jest.Mock).mock.calls[0];
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+      const call = uploadBufferMock.mock.calls[0] as [Buffer, string, string];
       const buffer = call[0];
       const html = buffer.toString('utf-8');
 
@@ -166,7 +188,8 @@ describe('EvidenceCollectorService', () => {
 
       expect(url).toBeDefined();
 
-      const call = (gcsStorageService.uploadBuffer as jest.Mock).mock.calls[0];
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+      const call = uploadBufferMock.mock.calls[0] as [Buffer, string, string];
       const buffer = call[0];
       const html = buffer.toString('utf-8');
 
@@ -187,9 +210,10 @@ describe('EvidenceCollectorService', () => {
 
       await page.waitForTimeout(100); // Wait for script execution
 
-      const url = await service.captureDOMSnapshot(page, 'sub-js', 'task-js');
+      await service.captureDOMSnapshot(page, 'sub-js', 'task-js');
 
-      const call = (gcsStorageService.uploadBuffer as jest.Mock).mock.calls[0];
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+      const call = uploadBufferMock.mock.calls[0] as [Buffer, string, string];
       const buffer = call[0];
       const html = buffer.toString('utf-8');
 
@@ -198,9 +222,10 @@ describe('EvidenceCollectorService', () => {
     });
 
     it('should convert HTML to UTF-8 buffer', async () => {
-      const url = await service.captureDOMSnapshot(page, 'sub-encoding', 'task-utf8');
+      await service.captureDOMSnapshot(page, 'sub-encoding', 'task-utf8');
 
-      const call = (gcsStorageService.uploadBuffer as jest.Mock).mock.calls[0];
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+      const call = uploadBufferMock.mock.calls[0] as [Buffer, string, string];
       const buffer = call[0];
       const contentType = call[2];
 
@@ -239,7 +264,9 @@ describe('EvidenceCollectorService', () => {
       });
 
       const videoPage = await videoContext.newPage();
-      await videoPage.setContent('<html><body><h1>Video Test</h1></body></html>');
+      await videoPage.setContent(
+        '<html><body><h1>Video Test</h1></body></html>',
+      );
       await videoPage.click('body'); // Some interaction
 
       await videoPage.close();
@@ -269,10 +296,12 @@ describe('EvidenceCollectorService', () => {
 
       await service.captureScreenshot(page, submissionId, taskId);
 
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalledWith(
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalledWith(
         expect.any(Buffer),
         'evidence/uuid-123-456/task-verify-button/screenshot.png',
-        'image/png'
+        'image/png',
       );
     });
 
@@ -282,10 +311,12 @@ describe('EvidenceCollectorService', () => {
 
       await service.captureDOMSnapshot(page, submissionId, taskId);
 
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalledWith(
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalledWith(
         expect.any(Buffer),
         'evidence/uuid-789-012/task-check-form/dom.html',
-        'text/html'
+        'text/html',
       );
     });
   });
@@ -295,14 +326,24 @@ describe('EvidenceCollectorService', () => {
       const submissionId = 'sub-integration';
       const taskId = 'task-full';
 
-      const screenshotUrl = await service.captureScreenshot(page, submissionId, taskId);
-      const domUrl = await service.captureDOMSnapshot(page, submissionId, taskId);
+      const screenshotUrl = await service.captureScreenshot(
+        page,
+        submissionId,
+        taskId,
+      );
+      const domUrl = await service.captureDOMSnapshot(
+        page,
+        submissionId,
+        taskId,
+      );
 
       expect(screenshotUrl).toContain('screenshot.png');
       expect(domUrl).toContain('dom.html');
       expect(screenshotUrl).toContain(submissionId);
       expect(domUrl).toContain(submissionId);
-      expect(gcsStorageService.uploadBuffer).toHaveBeenCalledTimes(2);
+      const uploadBufferMock = gcsStorageService.uploadBuffer as jest.Mock;
+
+      expect(uploadBufferMock).toHaveBeenCalledTimes(2);
     });
   });
 });

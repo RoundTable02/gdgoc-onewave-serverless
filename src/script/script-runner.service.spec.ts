@@ -44,10 +44,10 @@ describe('ScriptRunnerService', () => {
         const title = await page.textContent('h1');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
@@ -58,10 +58,10 @@ describe('ScriptRunnerService', () => {
         throw new Error('Test error');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Test error');
@@ -152,10 +152,10 @@ describe('ScriptRunnerService', () => {
         await expect(page.locator('#result')).toHaveText('Clicked!');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
     });
@@ -165,10 +165,10 @@ describe('ScriptRunnerService', () => {
         await expect(page.locator('h1')).toHaveText('Wrong Text', { timeout: 1000 });
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -179,10 +179,10 @@ describe('ScriptRunnerService', () => {
         const invalid syntax here
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -194,10 +194,10 @@ describe('ScriptRunnerService', () => {
         const url = page.url();
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
     });
@@ -219,10 +219,10 @@ describe('ScriptRunnerService', () => {
         await expect(page.locator('p')).toHaveText('Paragraph');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
     });
@@ -232,10 +232,10 @@ describe('ScriptRunnerService', () => {
         await page.textContent('h1');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
     });
@@ -245,10 +245,10 @@ describe('ScriptRunnerService', () => {
         throw new Error('Error with "quotes" and \\n newlines');
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('quotes');
@@ -263,10 +263,10 @@ describe('ScriptRunnerService', () => {
            주석 */
       `;
 
-      const result = await service.execute(
-        code,
-        { page, expect: playwrightExpect },
-      );
+      const result = await service.execute(code, {
+        page,
+        expect: playwrightExpect,
+      });
 
       expect(result.success).toBe(true);
     });

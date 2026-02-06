@@ -11,7 +11,9 @@ export class GradingController {
 
   @Post('grade')
   @HttpCode(200)
-  async runGrading(@Body() request: GradingRequestDto): Promise<GradingResponseDto> {
+  async runGrading(
+    @Body() request: GradingRequestDto,
+  ): Promise<GradingResponseDto> {
     this.logger.log(`Grading request received: ${request.submissionId}`);
     return this.gradingService.runGrading(request);
   }
@@ -20,7 +22,7 @@ export class GradingController {
   healthCheck(): { status: string; timestamp: string } {
     return {
       status: 'ok',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BrowserManagerService } from './browser-manager.service';
-import { Browser, BrowserContext } from 'playwright';
 
 describe('BrowserManagerService', () => {
   let service: BrowserManagerService;
@@ -98,8 +97,8 @@ describe('BrowserManagerService', () => {
       const page = await context.newPage();
 
       const locale = await page.evaluate(() => navigator.language);
-      const timezone = await page.evaluate(() =>
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      const timezone = await page.evaluate(
+        () => Intl.DateTimeFormat().resolvedOptions().timeZone,
       );
 
       expect(locale).toBe('ko-KR');

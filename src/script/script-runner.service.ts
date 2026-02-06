@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ScriptContext, ExecutionResult, ExecutionOptions } from './interfaces/script.interface';
+import {
+  ScriptContext,
+  ExecutionResult,
+  ExecutionOptions,
+} from './interfaces/script.interface';
 
 @Injectable()
 export class ScriptRunnerService {
@@ -14,22 +18,31 @@ export class ScriptRunnerService {
 
     try {
       // AsyncFunction 생성자를 사용하여 동적 코드 실행
-      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const AsyncFunction = Object.getPrototypeOf(
+        async function () {},
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      ).constructor;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const fn = new AsyncFunction('page', 'expect', code);
 
       // 타임아웃과 함께 실행
       await Promise.race([
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         fn(context.page, context.expect),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Script execution timeout')), timeout)
+          setTimeout(
+            () => reject(new Error('Script execution timeout')),
+            timeout,
+          ),
         ),
       ]);
 
       this.logger.debug('Script executed successfully');
       return { success: true };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.warn(`Script execution failed: ${errorMessage}`);
 
       let screenshot: Buffer | undefined;
@@ -39,7 +52,7 @@ export class ScriptRunnerService {
         try {
           screenshot = await context.page.screenshot({ type: 'png' });
           html = await context.page.content();
-        } catch (captureError) {
+        } catch {
           this.logger.warn('Failed to capture error evidence');
         }
       }

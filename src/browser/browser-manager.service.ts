@@ -1,5 +1,10 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { chromium, Browser, BrowserContext, BrowserContextOptions } from 'playwright';
+import {
+  chromium,
+  Browser,
+  BrowserContext,
+  BrowserContextOptions,
+} from 'playwright';
 import { BROWSER_CONFIG } from './browser.config';
 
 @Injectable()
@@ -17,7 +22,9 @@ export class BrowserManagerService implements OnModuleDestroy {
     return this.browser;
   }
 
-  async createContext(options?: BrowserContextOptions): Promise<BrowserContext> {
+  async createContext(
+    options?: BrowserContextOptions,
+  ): Promise<BrowserContext> {
     if (!this.browser) {
       await this.launchBrowser();
     }

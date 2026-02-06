@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { GradingService } from './grading.service';
 import { BrowserManagerService } from '../browser/browser-manager.service';
@@ -60,7 +61,9 @@ describe('GradingService', () => {
         {
           provide: EvidenceCollectorService,
           useValue: {
-            captureScreenshot: jest.fn().mockResolvedValue('https://screenshot.png'),
+            captureScreenshot: jest
+              .fn()
+              .mockResolvedValue('https://screenshot.png'),
           },
         },
         {
@@ -79,8 +82,12 @@ describe('GradingService', () => {
     browserManager = module.get<BrowserManagerService>(BrowserManagerService);
     scriptParser = module.get<ScriptParserService>(ScriptParserService);
     scriptRunner = module.get<ScriptRunnerService>(ScriptRunnerService);
-    evidenceCollector = module.get<EvidenceCollectorService>(EvidenceCollectorService);
-    feedbackGenerator = module.get<FeedbackGeneratorService>(FeedbackGeneratorService);
+    evidenceCollector = module.get<EvidenceCollectorService>(
+      EvidenceCollectorService,
+    );
+    feedbackGenerator = module.get<FeedbackGeneratorService>(
+      FeedbackGeneratorService,
+    );
   });
 
   afterEach(() => {
@@ -95,7 +102,8 @@ describe('GradingService', () => {
     const request: GradingRequestDto = {
       submissionId: '550e8400-e29b-41d4-a716-446655440000',
       targetUrl: 'https://example.com',
-      playwrightScript: 'test("Test 1", async ({ page }) => { await page.click("button"); });',
+      playwrightScript:
+        'test("Test 1", async ({ page }) => { await page.click("button"); });',
     };
 
     it('should successfully grade a submission with passing tests', async () => {
@@ -112,7 +120,7 @@ describe('GradingService', () => {
       await service.runGrading(request);
 
       expect(scriptParser.parsePlaywrightScript).toHaveBeenCalledWith(
-        request.playwrightScript
+        request.playwrightScript,
       );
     });
 
@@ -126,10 +134,9 @@ describe('GradingService', () => {
     it('should navigate to target URL', async () => {
       await service.runGrading(request);
 
-      expect(mockPage.goto).toHaveBeenCalledWith(
-        request.targetUrl,
-        { waitUntil: 'domcontentloaded' }
-      );
+      expect(mockPage.goto).toHaveBeenCalledWith(request.targetUrl, {
+        waitUntil: 'domcontentloaded',
+      });
     });
 
     it('should execute each test script', async () => {
@@ -137,7 +144,7 @@ describe('GradingService', () => {
 
       expect(scriptRunner.execute).toHaveBeenCalledWith(
         'await page.click("button");',
-        expect.objectContaining({ page: mockPage })
+        expect.objectContaining({ page: mockPage }),
       );
     });
 
@@ -171,7 +178,7 @@ describe('GradingService', () => {
       expect(evidenceCollector.captureScreenshot).toHaveBeenCalledWith(
         mockPage,
         request.submissionId,
-        expect.any(String)
+        expect.any(String),
       );
     });
 
@@ -188,7 +195,7 @@ describe('GradingService', () => {
           taskName: 'Test 1',
           message: 'Test error',
         }),
-        expect.any(String)
+        expect.any(String),
       );
     });
 
@@ -247,7 +254,7 @@ describe('GradingService', () => {
 
     it('should handle browser launch errors', async () => {
       (browserManager.launchBrowser as jest.Mock).mockRejectedValueOnce(
-        new Error('Browser launch failed')
+        new Error('Browser launch failed'),
       );
 
       const result = await service.runGrading(request);
@@ -288,7 +295,7 @@ describe('GradingService', () => {
       expect(evidenceCollector.captureScreenshot).toHaveBeenCalledWith(
         mockPage,
         request.submissionId,
-        'Test_with_spaces'
+        'Test_with_spaces',
       );
     });
 
@@ -322,7 +329,7 @@ describe('GradingService', () => {
         expect.objectContaining({
           message: 'Unknown error',
         }),
-        expect.any(String)
+        expect.any(String),
       );
     });
   });

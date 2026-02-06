@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { GradingController } from './grading.controller';
 import { GradingService } from './grading.service';
@@ -45,7 +46,8 @@ describe('GradingController', () => {
     const request: GradingRequestDto = {
       submissionId: '550e8400-e29b-41d4-a716-446655440000',
       targetUrl: 'https://example.com',
-      playwrightScript: 'test("Test 1", async ({ page }) => { await page.click("button"); });',
+      playwrightScript:
+        'test("Test 1", async ({ page }) => { await page.click("button"); });',
     };
 
     it('should handle grading request', async () => {
@@ -128,10 +130,12 @@ describe('GradingController', () => {
 
     it('should propagate service errors', async () => {
       (service.runGrading as jest.Mock).mockRejectedValueOnce(
-        new Error('Service error')
+        new Error('Service error'),
       );
 
-      await expect(controller.runGrading(request)).rejects.toThrow('Service error');
+      await expect(controller.runGrading(request)).rejects.toThrow(
+        'Service error',
+      );
     });
 
     it('should handle different submission IDs', async () => {
@@ -145,7 +149,9 @@ describe('GradingController', () => {
         submissionId: differentRequest.submissionId,
       };
 
-      (service.runGrading as jest.Mock).mockResolvedValueOnce(differentResponse);
+      (service.runGrading as jest.Mock).mockResolvedValueOnce(
+        differentResponse,
+      );
 
       const result = await controller.runGrading(differentRequest);
 
