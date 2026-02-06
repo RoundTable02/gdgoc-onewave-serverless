@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { GradingService } from './grading.service';
 import { BrowserManagerService } from '../browser/browser-manager.service';
 import { ScriptParserService } from '../script/script-parser.service';
@@ -52,6 +53,20 @@ describe('GradingService', () => {
           provide: ScriptRunnerService,
           useValue: {
             execute: jest.fn().mockResolvedValue({ success: true }),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string, defaultValue?: any) => {
+              const config: Record<string, any> = {
+                'grading.enableParallelExecution': false, // Use sequential for simpler testing
+                'grading.timeoutMs': 300000,
+                'grading.maxConcurrentTests': 5,
+                'grading.testTimeoutMs': 30000,
+              };
+              return config[key] ?? defaultValue;
+            }),
           },
         },
       ],
