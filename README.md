@@ -427,10 +427,12 @@ connectable-serverless/
 
 ## License
 
-This project is **UNLICENSED** - Private repository.
+This project is developed for **GDG on Campus OneWave Hackathon**.
 
 ---
 
-<p align="center">
-  <sub>Built with NestJS + Playwright + Gemini AI</sub>
-</p>
+## Team
+
+**GDG on Campus OneWave**
+
+Built with Spring Boot, Gemini AI, and Playwright.
