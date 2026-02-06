@@ -148,11 +148,11 @@ describe('GradingService', () => {
       );
     });
 
-    it('should close browser and context after grading', async () => {
+    it('should close context after grading', async () => {
       await service.runGrading(request);
 
       expect(mockContext.close).toHaveBeenCalled();
-      expect(mockBrowser.close).toHaveBeenCalled();
+      // Browser lifecycle is managed by BrowserManagerService
     });
 
     it('should handle test failures', async () => {
@@ -278,7 +278,7 @@ describe('GradingService', () => {
       await service.runGrading(request);
 
       expect(mockContext.close).toHaveBeenCalled();
-      expect(mockBrowser.close).toHaveBeenCalled();
+      // Browser lifecycle is managed by BrowserManagerService
     });
 
     it('should sanitize task IDs for file paths', async () => {
