@@ -58,8 +58,8 @@ describe('GradingService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string, defaultValue?: any) => {
-              const config: Record<string, any> = {
+            get: jest.fn((key: string, defaultValue?: boolean | number) => {
+              const config: Record<string, boolean | number> = {
                 'grading.enableParallelExecution': false, // Use sequential for simpler testing
                 'grading.timeoutMs': 300000,
                 'grading.maxConcurrentTests': 5,
