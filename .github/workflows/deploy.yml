@@ -97,6 +97,7 @@ jobs:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.GCP_REGION }}
           image: ${{ env.IMAGE_NAME }}
+          no_traffic: false
           env_vars: |
             NODE_ENV=production
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
@@ -114,6 +115,18 @@ jobs:
             --format='value(status.url)')
           echo "SERVICE_URL=${SERVICE_URL}" >> $GITHUB_ENV
           echo "Service URL: ${SERVICE_URL}"
+
+      - name: Verify traffic routing
+        run: |
+          echo "Checking traffic routing..."
+          gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.GCP_REGION }} \
+            --format='table(status.traffic.revisionName,status.traffic.percent)'
+
+          LATEST_REVISION=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.GCP_REGION }} \
+            --format='value(status.latestReadyRevisionName)')
+          echo "Latest revision: ${LATEST_REVISION}"
 
       - name: Health check
         run: |
