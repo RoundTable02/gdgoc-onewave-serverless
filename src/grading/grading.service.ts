@@ -10,7 +10,7 @@ import {
   GradingResultItem,
 } from './dto/grading-response.dto';
 import { expect } from '@playwright/test';
-import { Browser, BrowserContext, Page } from 'playwright';
+import { BrowserContext, Page } from 'playwright';
 
 @Injectable()
 export class GradingService {
@@ -45,13 +45,12 @@ export class GradingService {
       };
     }
 
-    let browser: Browser | undefined;
     let context: BrowserContext | undefined;
     let page: Page | undefined;
 
     try {
       // 2. 브라우저 실행
-      browser = await this.browserManager.launchBrowser();
+      await this.browserManager.launchBrowser();
       context = await this.browserManager.createContext();
       page = await context.newPage();
 
@@ -127,9 +126,7 @@ export class GradingService {
       if (context) {
         await context.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+      // Browser lifecycle is managed by BrowserManagerService
     }
   }
 }
