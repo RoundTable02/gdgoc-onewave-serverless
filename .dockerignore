@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+build
+
+# Tests
+test
+coverage
+*.spec.ts
+*.e2e-spec.ts
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+!package.json
+docs
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Linting and formatting
+.eslintrc
+.eslintrc.json
+.eslintignore
+eslint.config.mjs
+.prettierrc
+.prettierignore
+
+# Others
+others
+
+# Misc
+.DS_Store
+*.log
+.cache

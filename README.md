@@ -23,7 +23,25 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+NestJS 기반의 Playwright 자동화 채점 워커 서비스입니다. 프론트엔드 과제를 자동으로 채점하고 AI 피드백을 생성하는 마이크로서비스로, GCP Cloud Run에 배포되어 실행됩니다.
+
+### 주요 기능
+
+- 🎭 **Playwright 자동화**: Chromium 브라우저를 사용한 프론트엔드 테스트 자동화
+- 🤖 **AI 피드백**: Google Gemini API를 활용한 지능형 피드백 생성
+- 📸 **증거 수집**: 스크린샷 및 비디오 녹화를 GCS에 저장
+- ☁️ **Cloud Native**: GCP Cloud Run에 최적화된 컨테이너 아키텍처
+- 🔄 **CI/CD**: GitHub Actions를 통한 자동 배포
+
+### 기술 스택
+
+- **Framework**: NestJS 11.x
+- **Runtime**: Node.js 20 LTS
+- **Browser Automation**: Playwright 1.58.1
+- **Cloud Storage**: Google Cloud Storage
+- **AI**: Google Gemini API
+- **Deployment**: Docker + Cloud Run
+- **CI/CD**: GitHub Actions
 
 ## Project setup
 
@@ -57,42 +75,198 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## Environment Variables
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+애플리케이션 실행에 필요한 환경 변수:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `PORT` | No | `8080` | 서버 포트 |
+| `NODE_ENV` | No | `development` | 실행 환경 (development/production/test) |
+| `GEMINI_API_KEY` | **Yes** | - | Google Gemini API 키 |
+| `GCS_BUCKET` | **Yes** | - | 증거 파일을 저장할 GCS 버킷 이름 |
+| `GCS_PROJECT_ID` | **Yes** | - | GCP 프로젝트 ID |
+| `GRADING_TIMEOUT_MS` | No | `300000` | 채점 타임아웃 (밀리초) |
+| `BROWSER_HEADLESS` | No | `true` | Headless 모드 실행 여부 |
+| `ENABLE_VIDEO_RECORDING` | No | `false` | 비디오 녹화 활성화 여부 |
+
+`.env.example` 파일을 복사하여 로컬 환경 설정:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
+# .env 파일 편집하여 실제 값 입력
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Architecture
+
+```
+┌─────────────────────────────────────────┐
+│         GitHub Actions                  │
+│  (CI/CD Pipeline)                       │
+│  • Test → Build → Deploy                │
+└──────────────┬──────────────────────────┘
+               │
+               v
+┌─────────────────────────────────────────┐
+│    GCP Artifact Registry                │
+│  (Docker Image Repository)              │
+└──────────────┬──────────────────────────┘
+               │
+               v
+┌─────────────────────────────────────────┐
+│    GCP Cloud Run                        │
+│  ┌────────────────────────────────────┐ │
+│  │  connectable-worker               │ │
+│  │  • NestJS Application             │ │
+│  │  • Playwright + Chromium          │ │
+│  │  • Memory: 2GiB, CPU: 2 vCPU     │ │
+│  └────────────────────────────────────┘ │
+└──────────┬─────────────────┬────────────┘
+           │                 │
+           v                 v
+  ┌────────────────┐  ┌─────────────────┐
+  │  Google Cloud  │  │  Google Gemini  │
+  │    Storage     │  │      API        │
+  │  (Screenshots) │  │   (Feedback)    │
+  └────────────────┘  └─────────────────┘
+```
+
+## API Endpoints
+
+### Health Check
+```http
+GET /health
+```
+
+**Response**:
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-02-06T10:30:00.000Z"
+}
+```
+
+### Grade Submission
+```http
+POST /grade
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
+{
+  "submissionId": "sub_12345",
+  "targetUrl": "https://storage.googleapis.com/bucket/user/index.html",
+  "testScripts": [
+    {
+      "taskId": "task_1",
+      "taskName": "로그인 버튼 가시성 확인",
+      "code": "await expect(page.locator('button:has-text(\"로그인\")')).toBeVisible();"
+    }
+  ]
+}
+```
+
+## Deployment
+
+이 프로젝트는 GitHub Actions를 통해 GCP Cloud Run에 자동으로 배포됩니다.
+
+### 자동 배포
+
+`main` 브랜치에 push하면 자동으로 배포가 시작됩니다:
+
+```bash
+git push origin main
+```
+
+### 수동 배포
+
+1. GitHub 레포지토리의 **Actions** 탭으로 이동
+2. **Deploy to Cloud Run** 워크플로우 선택
+3. **Run workflow** 버튼 클릭
+
+### 배포 가이드
+
+전체 배포 설정 및 GCP 인프라 구성 방법은 [DEPLOYMENT.md](docs/DEPLOYMENT.md) 문서를 참조하세요.
+
+**주요 내용**:
+- GCP 인프라 설정
+- Service Account 생성
+- GitHub Secrets 설정
+- 트러블슈팅 가이드
+- 롤백 절차
+
+## Docker
+
+### 로컬 빌드 및 실행
+
+```bash
+# Docker 이미지 빌드
+docker build -t grading-worker:local .
+
+# 컨테이너 실행
+docker run -p 8080:8080 --env-file .env grading-worker:local
+
+# 헬스체크
+curl http://localhost:8080/health
+```
+
+### Multi-Stage Build
+
+Dockerfile은 3단계 빌드를 사용하여 최종 이미지 크기를 최적화합니다:
+
+1. **Builder**: TypeScript 컴파일
+2. **Playwright**: Chromium 설치
+3. **Runtime**: 최소한의 프로덕션 이미지
+
+## Development
+
+### Prerequisites
+
+- Node.js 20 LTS
+- Docker (for containerization)
+- Google Cloud SDK (for deployment)
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your credentials
+```
+
+### Development Mode
+
+```bash
+# Watch mode with hot reload
+npm run start:dev
+```
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
+### Project Documentation
+- [Deployment Guide](docs/DEPLOYMENT.md) - 배포 설정 및 GCP 인프라 가이드
+- [API Server Spec](others/API_SERVER_SPEC.md) - API 서버 명세
+- [Requirements](REQUIREMENTS.md) - 프로젝트 요구사항
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### External Resources
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Playwright Documentation](https://playwright.dev/)
+- [Cloud Run Documentation](https://cloud.google.com/run/docs)
+- [Google Gemini API](https://ai.google.dev/)
 
-## Support
+## Contributing
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is licensed under the UNLICENSED license.
