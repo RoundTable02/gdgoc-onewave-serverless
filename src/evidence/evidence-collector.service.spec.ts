@@ -55,8 +55,12 @@ describe('EvidenceCollectorService', () => {
   });
 
   afterEach(async () => {
-    await page.close();
-    await context.close();
+    if (page) {
+      await page.close();
+    }
+    if (context) {
+      await context.close();
+    }
   });
 
   it('should be defined', () => {
