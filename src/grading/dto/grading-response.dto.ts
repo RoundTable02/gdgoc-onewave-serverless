@@ -1,7 +1,6 @@
 export class GradingResultItem {
   taskName: string;
   isPassed: boolean;
-  feedback: string;
 }
 
 export class GradingResponseDto {

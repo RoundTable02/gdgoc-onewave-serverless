@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsUrl } from 'class-validator';
+import { IsString, IsUUID, IsUrl, IsArray } from 'class-validator';
 
 export class GradingRequestDto {
   @IsUUID()
@@ -9,4 +9,8 @@ export class GradingRequestDto {
 
   @IsString()
   playwrightScript: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  subTasks: string[];
 }

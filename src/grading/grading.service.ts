@@ -71,33 +71,12 @@ export class GradingService {
           results.push({
             taskName: script.taskName,
             isPassed: true,
-            feedback: '테스트 통과',
           });
         } else {
           hasErrors = true;
-
-          // 실패 시 스크린샷 저장
-          const taskId = script.taskName.replace(/\s+/g, '_');
-          const screenshotUrl = await this.evidenceCollector.captureScreenshot(
-            page,
-            submissionId,
-            taskId,
-          );
-
-          // AI 피드백 생성
-          const feedback = await this.feedbackGenerator.generateFeedback(
-            {
-              taskName: script.taskName,
-              code: script.code,
-              message: result.error || 'Unknown error',
-            },
-            screenshotUrl,
-          );
-
           results.push({
             taskName: script.taskName,
             isPassed: false,
-            feedback: `${feedback.summary} ${feedback.suggestion}`,
           });
         }
       }
