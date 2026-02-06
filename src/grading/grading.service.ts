@@ -128,7 +128,9 @@ export class GradingService {
   ): Promise<GradingResponseDto> {
     const { submissionId, targetUrl, playwrightScript } = request;
 
-    this.logger.log(`Starting parallel grading for submission: ${submissionId}`);
+    this.logger.log(
+      `Starting parallel grading for submission: ${submissionId}`,
+    );
 
     // 1. 스크립트 파싱
     const testScripts =
@@ -203,7 +205,9 @@ export class GradingService {
       'grading.maxConcurrentTests',
       5,
     );
-    const results: GradingResultItem[] = new Array(testScripts.length);
+    const results: GradingResultItem[] = new Array<GradingResultItem>(
+      testScripts.length,
+    );
     const executing: Set<Promise<void>> = new Set();
 
     this.logger.log(

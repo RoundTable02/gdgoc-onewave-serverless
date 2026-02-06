@@ -141,7 +141,6 @@ describe('GradingService', () => {
       expect(result.results[0].isPassed).toBe(false);
     });
 
-
     it('should handle multiple test cases', async () => {
       (scriptParser.parsePlaywrightScript as jest.Mock).mockReturnValueOnce([
         { taskName: 'Test 1', code: 'code1' },
@@ -211,7 +210,6 @@ describe('GradingService', () => {
       expect(mockContext.close).toHaveBeenCalled();
       // Browser lifecycle is managed by BrowserManagerService
     });
-
 
     it('should set success to false if any test fails', async () => {
       (scriptParser.parsePlaywrightScript as jest.Mock).mockReturnValueOnce([
