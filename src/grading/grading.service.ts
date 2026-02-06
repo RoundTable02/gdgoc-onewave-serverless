@@ -2,8 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { BrowserManagerService } from '../browser/browser-manager.service';
 import { ScriptParserService } from '../script/script-parser.service';
 import { ScriptRunnerService } from '../script/script-runner.service';
-import { EvidenceCollectorService } from '../evidence/evidence-collector.service';
-import { FeedbackGeneratorService } from '../feedback/feedback-generator.service';
 import { GradingRequestDto } from './dto/grading-request.dto';
 import {
   GradingResponseDto,
@@ -20,8 +18,6 @@ export class GradingService {
     private readonly browserManager: BrowserManagerService,
     private readonly scriptParser: ScriptParserService,
     private readonly scriptRunner: ScriptRunnerService,
-    private readonly evidenceCollector: EvidenceCollectorService,
-    private readonly feedbackGenerator: FeedbackGeneratorService,
   ) {}
 
   async runGrading(request: GradingRequestDto): Promise<GradingResponseDto> {

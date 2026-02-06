@@ -4,8 +4,6 @@ import { GradingService } from './grading.service';
 import { BrowserManagerService } from '../browser/browser-manager.service';
 import { ScriptParserService } from '../script/script-parser.service';
 import { ScriptRunnerService } from '../script/script-runner.service';
-import { EvidenceCollectorService } from '../evidence/evidence-collector.service';
-import { FeedbackGeneratorService } from '../feedback/feedback-generator.service';
 import { GradingRequestDto } from './dto/grading-request.dto';
 
 describe('GradingService', () => {
@@ -13,8 +11,6 @@ describe('GradingService', () => {
   let browserManager: BrowserManagerService;
   let scriptParser: ScriptParserService;
   let scriptRunner: ScriptRunnerService;
-  let evidenceCollector: EvidenceCollectorService;
-  let feedbackGenerator: FeedbackGeneratorService;
 
   const mockPage = {
     goto: jest.fn().mockResolvedValue(undefined),
@@ -58,23 +54,6 @@ describe('GradingService', () => {
             execute: jest.fn().mockResolvedValue({ success: true }),
           },
         },
-        {
-          provide: EvidenceCollectorService,
-          useValue: {
-            captureScreenshot: jest
-              .fn()
-              .mockResolvedValue('https://screenshot.png'),
-          },
-        },
-        {
-          provide: FeedbackGeneratorService,
-          useValue: {
-            generateFeedback: jest.fn().mockResolvedValue({
-              summary: 'Test failed',
-              suggestion: 'Fix the code',
-            }),
-          },
-        },
       ],
     }).compile();
 
@@ -82,12 +61,6 @@ describe('GradingService', () => {
     browserManager = module.get<BrowserManagerService>(BrowserManagerService);
     scriptParser = module.get<ScriptParserService>(ScriptParserService);
     scriptRunner = module.get<ScriptRunnerService>(ScriptRunnerService);
-    evidenceCollector = module.get<EvidenceCollectorService>(
-      EvidenceCollectorService,
-    );
-    feedbackGenerator = module.get<FeedbackGeneratorService>(
-      FeedbackGeneratorService,
-    );
   });
 
   afterEach(() => {
@@ -104,6 +77,7 @@ describe('GradingService', () => {
       targetUrl: 'https://example.com',
       playwrightScript:
         'test("Test 1", async ({ page }) => { await page.click("button"); });',
+      subTasks: ['Test 1'],
     };
 
     it('should successfully grade a submission with passing tests', async () => {
@@ -167,49 +141,6 @@ describe('GradingService', () => {
       expect(result.results[0].isPassed).toBe(false);
     });
 
-    it('should capture screenshot on test failure', async () => {
-      (scriptRunner.execute as jest.Mock).mockResolvedValueOnce({
-        success: false,
-        error: 'Test error',
-      });
-
-      await service.runGrading(request);
-
-      expect(evidenceCollector.captureScreenshot).toHaveBeenCalledWith(
-        mockPage,
-        request.submissionId,
-        expect.any(String),
-      );
-    });
-
-    it('should generate feedback on test failure', async () => {
-      (scriptRunner.execute as jest.Mock).mockResolvedValueOnce({
-        success: false,
-        error: 'Test error',
-      });
-
-      await service.runGrading(request);
-
-      expect(feedbackGenerator.generateFeedback).toHaveBeenCalledWith(
-        expect.objectContaining({
-          taskName: 'Test 1',
-          message: 'Test error',
-        }),
-        expect.any(String),
-      );
-    });
-
-    it('should include feedback in failed test result', async () => {
-      (scriptRunner.execute as jest.Mock).mockResolvedValueOnce({
-        success: false,
-        error: 'Test error',
-      });
-
-      const result = await service.runGrading(request);
-
-      expect(result.results[0].feedback).toContain('Test failed');
-      expect(result.results[0].feedback).toContain('Fix the code');
-    });
 
     it('should handle multiple test cases', async () => {
       (scriptParser.parsePlaywrightScript as jest.Mock).mockReturnValueOnce([
@@ -281,23 +212,6 @@ describe('GradingService', () => {
       // Browser lifecycle is managed by BrowserManagerService
     });
 
-    it('should sanitize task IDs for file paths', async () => {
-      (scriptParser.parsePlaywrightScript as jest.Mock).mockReturnValueOnce([
-        { taskName: 'Test with spaces', code: 'code' },
-      ]);
-      (scriptRunner.execute as jest.Mock).mockResolvedValueOnce({
-        success: false,
-        error: 'Error',
-      });
-
-      await service.runGrading(request);
-
-      expect(evidenceCollector.captureScreenshot).toHaveBeenCalledWith(
-        mockPage,
-        request.submissionId,
-        'Test_with_spaces',
-      );
-    });
 
     it('should set success to false if any test fails', async () => {
       (scriptParser.parsePlaywrightScript as jest.Mock).mockReturnValueOnce([
@@ -325,12 +239,6 @@ describe('GradingService', () => {
       const result = await service.runGrading(request);
 
       expect(result.results[0].isPassed).toBe(false);
-      expect(feedbackGenerator.generateFeedback).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Unknown error',
-        }),
-        expect.any(String),
-      );
     });
   });
 });
